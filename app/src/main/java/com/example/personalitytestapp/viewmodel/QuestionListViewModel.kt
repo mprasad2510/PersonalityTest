@@ -1,27 +1,37 @@
 package com.example.personalitytestapp.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.personalitytestapp.model.QuestionList
-import com.example.personalitytestapp.network.RetroInstance
-import com.example.personalitytestapp.network.RetroService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import androidx.lifecycle.*
+import com.example.personalitytestapp.repository.QuestionListRepository
+import com.example.personalitytestapp.model.Data
 
-class QuestionListViewModel : ViewModel() {
+class QuestionListViewModel(
+    private val repository: QuestionListRepository
+) : ViewModel() {
 
-    var questionListLiveData : MutableLiveData<QuestionList> = MutableLiveData()
-
-    fun getQuestionListObserver() : MutableLiveData<QuestionList> {
-        return questionListLiveData
+    var questionListLiveData = liveData<Result<Data>> {
+        emitSource(repository.getQuestionsList().asLiveData())
     }
 
-    fun makeApiCall() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val retroInstance = RetroInstance.getRetroInstance().create(RetroService::class.java)
-            val response = retroInstance.getDataFromApi()
-            questionListLiveData.postValue(response)
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            repository.getQuestionsList()
+//                .collect {
+//                    questionListLiveData.value = it
+//                }
+//        }
+//    }
+
+
+//    fun getQuestionListObserver() : MutableLiveData<List<QuestionsItem>> {
+//        return questionListLiveData
+//    }
+//
+//
+//    fun makeApiCall() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val retroInstance = RetroInstance.getRetroInstance().create(RetroService::class.java)
+//            val response = retroInstance.getDataFromApi()
+//            questionListLiveData.postValue(response)
+//        }
+//    }
 }
